@@ -31,4 +31,40 @@
         }
     </style>
 </head>
+  <body>
+    <div class="container">
+        <h1>Battery Status</h1>
+        <p id="battery">Checking battery...</p>
+    </div>
+
+    <script>
+        function getBatteryEmoji(level, charging) {
+            if (charging) return "⚡🔋";
+            if (level > 0.8) return "🔋";      // Full
+            else if (level > 0.5) return "🟩"; // Medium
+            else if (level > 0.2) return "🟨"; // Low
+            else return "🟥";                  // Very Low
+        }
+
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(function(battery) {
+                function updateBatteryInfo() {
+                    const percent = (battery.level * 100).toFixed(0);
+                    const emoji = getBatteryEmoji(battery.level, battery.charging);
+                    document.getElementById("battery").textContent =
+                        `Battery: ${percent}% ${emoji}` +
+                        (battery.charging ? " (Charging)" : "");
+                }
+                updateBatteryInfo();
+
+                // Update when battery changes
+                battery.addEventListener('levelchange', updateBatteryInfo);
+                battery.addEventListener('chargingchange', updateBatteryInfo);
+            });
+        } else {
+            document.getElementById("battery").textContent = "Battery API not supported on this browser.";
+        }
+    </script>
+</body>
+</html>
 
